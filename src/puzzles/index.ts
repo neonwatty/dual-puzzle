@@ -1,29 +1,37 @@
 import { colorBlockPuzzle } from './colorBlock';
-import { lineContinuationPuzzle } from './lineContinuation';
-import { connectedLinesPuzzle } from './connectedLines';
-import { pixelArtPuzzle } from './pixelArt';
+import { pixelArtPuzzle, heartPuzzle, crossPuzzle } from './pixelArt';
 import { doubleSidedPuzzle } from './doubleSided';
+import { xoPuzzle, arrowPuzzle, facePuzzle } from './generated';
 import type { Puzzle } from '../types/puzzle';
 
 export const puzzles: Record<string, Puzzle> = {
   'color-block-1': colorBlockPuzzle,
-  'line-continuation-1': lineContinuationPuzzle,
-  'connected-lines-1': connectedLinesPuzzle,
   'pixel-art-1': pixelArtPuzzle,
+  'pixel-heart-1': heartPuzzle,
+  'pixel-cross-1': crossPuzzle,
   'double-sided-1': doubleSidedPuzzle,
+  'generated-xo': xoPuzzle,
+  'generated-arrow': arrowPuzzle,
+  'generated-face': facePuzzle,
 };
 
+// Main puzzle list for the game - prioritize generated puzzles
 export const puzzleList: Puzzle[] = [
-  colorBlockPuzzle,
-  connectedLinesPuzzle,
-  pixelArtPuzzle,
-  doubleSidedPuzzle,
+  xoPuzzle,           // Generated: X vs O
+  arrowPuzzle,        // Generated: Up vs Down arrow
+  facePuzzle,         // Generated: Happy vs Sad face
+  colorBlockPuzzle,   // Simple colors
+  pixelArtPuzzle,     // Manual: Arrow right/down
+  doubleSidedPuzzle,  // Flip mechanic
 ];
 
 export {
   colorBlockPuzzle,
-  lineContinuationPuzzle,
-  connectedLinesPuzzle,
   pixelArtPuzzle,
+  heartPuzzle,
+  crossPuzzle,
   doubleSidedPuzzle,
+  xoPuzzle,
+  arrowPuzzle,
+  facePuzzle,
 };
