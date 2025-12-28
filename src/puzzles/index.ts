@@ -1,7 +1,7 @@
 import { colorBlockPuzzle } from './colorBlock';
 import { pixelArtPuzzle, heartPuzzle, crossPuzzle } from './pixelArt';
 import { doubleSidedPuzzle } from './doubleSided';
-import { xoPuzzle, arrowPuzzle, facePuzzle } from './generated';
+import { xoPuzzle, arrowPuzzle, facePuzzle, crossColorPuzzle } from './generated';
 import type { Puzzle } from '../types/puzzle';
 
 export const puzzles: Record<string, Puzzle> = {
@@ -13,6 +13,7 @@ export const puzzles: Record<string, Puzzle> = {
   'generated-xo': xoPuzzle,
   'generated-arrow': arrowPuzzle,
   'generated-face': facePuzzle,
+  'generated-cross-color': crossColorPuzzle,
 };
 
 // Main puzzle list for the game - prioritize generated puzzles
@@ -20,6 +21,7 @@ export const puzzleList: Puzzle[] = [
   xoPuzzle,           // Generated: X vs O
   arrowPuzzle,        // Generated: Up vs Down arrow
   facePuzzle,         // Generated: Happy vs Sad face
+  crossColorPuzzle,   // Generated: Cross-color with normalization
   colorBlockPuzzle,   // Simple colors
   pixelArtPuzzle,     // Manual: Arrow right/down
   doubleSidedPuzzle,  // Flip mechanic
@@ -34,4 +36,5 @@ export {
   xoPuzzle,
   arrowPuzzle,
   facePuzzle,
+  crossColorPuzzle,
 };
