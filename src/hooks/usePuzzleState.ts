@@ -12,18 +12,21 @@ export interface UsePuzzleStateReturn {
   solved: boolean;
   moveCount: number;
   puzzle: Puzzle;
+  flippedTiles: Set<string>;
 
   // Actions
   selectTile: (index: number) => void;
   swapWithSelected: (index: number) => void;
   handleTileClick: (index: number) => void;
   dragSwap: (fromIndex: number, toIndex: number) => void;
+  flipTile: (tileId: string) => void;
   shuffleTiles: () => void;
   reset: () => void;
 
   // Helpers
   getTileAtPosition: (position: number) => Tile | undefined;
   getTilesInArrangement: (arrangement: string[]) => Tile[];
+  isTileFlipped: (tileId: string) => boolean;
 }
 
 export function usePuzzleState(puzzle: Puzzle): UsePuzzleStateReturn {
@@ -43,12 +46,34 @@ export function usePuzzleState(puzzle: Puzzle): UsePuzzleStateReturn {
     null
   );
   const [moveCount, setMoveCount] = useState(0);
+  const [flippedTiles, setFlippedTiles] = useState<Set<string>>(new Set());
 
   // Check solution status
-  const solutionStatus = useMemo(
-    () => checkSolution(currentArrangement, puzzle.solutionA, puzzle.solutionB),
-    [currentArrangement, puzzle.solutionA, puzzle.solutionB]
-  );
+  // For double-sided puzzles, also check if flip state is correct
+  const solutionStatus = useMemo(() => {
+    const arrangementCheck = checkSolution(
+      currentArrangement,
+      puzzle.solutionA,
+      puzzle.solutionB
+    );
+
+    // For double-sided puzzles, solution A requires no flipped tiles
+    // and solution B requires all tiles flipped
+    if (puzzle.requiresFlip) {
+      const allFlipped = puzzle.tiles.every((t) => flippedTiles.has(t.id));
+      const noneFlipped = flippedTiles.size === 0;
+
+      return {
+        solvedA: arrangementCheck.solvedA && noneFlipped,
+        solvedB: arrangementCheck.solvedB && allFlipped,
+        solved:
+          (arrangementCheck.solvedA && noneFlipped) ||
+          (arrangementCheck.solvedB && allFlipped),
+      };
+    }
+
+    return arrangementCheck;
+  }, [currentArrangement, puzzle, flippedTiles]);
 
   // Get tile by ID
   const getTileById = useCallback(
@@ -74,6 +99,26 @@ export function usePuzzleState(puzzle: Puzzle): UsePuzzleStateReturn {
     },
     [getTileById]
   );
+
+  // Check if a tile is flipped
+  const isTileFlipped = useCallback(
+    (tileId: string): boolean => flippedTiles.has(tileId),
+    [flippedTiles]
+  );
+
+  // Flip a tile
+  const flipTile = useCallback((tileId: string) => {
+    setFlippedTiles((prev) => {
+      const next = new Set(prev);
+      if (next.has(tileId)) {
+        next.delete(tileId);
+      } else {
+        next.add(tileId);
+      }
+      return next;
+    });
+    setMoveCount((prev) => prev + 1);
+  }, []);
 
   // Select a tile for swap mode
   const selectTile = useCallback((index: number) => {
@@ -127,6 +172,7 @@ export function usePuzzleState(puzzle: Puzzle): UsePuzzleStateReturn {
     );
     setMoveCount(0);
     setSelectedTileIndex(null);
+    setFlippedTiles(new Set());
   }, [puzzle]);
 
   // Reset to initial shuffled state
@@ -134,6 +180,7 @@ export function usePuzzleState(puzzle: Puzzle): UsePuzzleStateReturn {
     setCurrentArrangement(initialArrangement);
     setMoveCount(0);
     setSelectedTileIndex(null);
+    setFlippedTiles(new Set());
   }, [initialArrangement]);
 
   return {
@@ -144,13 +191,16 @@ export function usePuzzleState(puzzle: Puzzle): UsePuzzleStateReturn {
     solved: solutionStatus.solved,
     moveCount,
     puzzle,
+    flippedTiles,
     selectTile,
     swapWithSelected,
     handleTileClick,
     dragSwap,
+    flipTile,
     shuffleTiles,
     reset,
     getTileAtPosition,
     getTilesInArrangement,
+    isTileFlipped,
   };
 }

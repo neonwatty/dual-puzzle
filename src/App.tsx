@@ -18,6 +18,8 @@ function PuzzleGame({ puzzle, onChangePuzzle }: { puzzle: Puzzle; onChangePuzzle
     moveCount,
     handleTileClick,
     dragSwap,
+    flipTile,
+    isTileFlipped,
     shuffleTiles,
     reset,
     getTileAtPosition,
@@ -40,6 +42,24 @@ function PuzzleGame({ puzzle, onChangePuzzle }: { puzzle: Puzzle; onChangePuzzle
   const handlePlayAgain = () => {
     setShowWinModal(false);
     shuffleTiles();
+  };
+
+  // Dynamic instructions based on puzzle type
+  const getInstructions = () => {
+    if (currentPuzzle.requiresFlip) {
+      return (
+        <>
+          <p>Click to select, click again to swap. Double-click to flip.</p>
+          <p className="mt-1">Flip all tiles and arrange for the second solution!</p>
+        </>
+      );
+    }
+    return (
+      <>
+        <p>Click two tiles to swap them, or drag and drop.</p>
+        <p className="mt-1">This puzzle has two solutions!</p>
+      </>
+    );
   };
 
   return (
@@ -79,6 +99,8 @@ function PuzzleGame({ puzzle, onChangePuzzle }: { puzzle: Puzzle; onChangePuzzle
           selectedTileIndex={selectedTileIndex}
           onTileClick={handleTileClick}
           onDragSwap={dragSwap}
+          onFlipTile={currentPuzzle.requiresFlip ? flipTile : undefined}
+          isTileFlipped={isTileFlipped}
         />
       </div>
 
@@ -100,8 +122,7 @@ function PuzzleGame({ puzzle, onChangePuzzle }: { puzzle: Puzzle; onChangePuzzle
 
       {/* Instructions */}
       <div className="mt-8 text-center text-slate-500 text-sm max-w-md">
-        <p>Click two tiles to swap them, or drag and drop.</p>
-        <p className="mt-1">This puzzle has two solutions!</p>
+        {getInstructions()}
       </div>
 
       {/* Win modal */}

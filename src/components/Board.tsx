@@ -9,6 +9,8 @@ interface BoardProps {
   selectedTileIndex: number | null;
   onTileClick: (index: number) => void;
   onDragSwap: (fromIndex: number, toIndex: number) => void;
+  onFlipTile?: (tileId: string) => void;
+  isTileFlipped?: (tileId: string) => boolean;
 }
 
 export function Board({
@@ -18,6 +20,8 @@ export function Board({
   selectedTileIndex,
   onTileClick,
   onDragSwap,
+  onFlipTile,
+  isTileFlipped,
 }: BoardProps) {
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -48,7 +52,7 @@ export function Board({
 
   return (
     <div
-      className="grid gap-2 p-4 bg-slate-800 rounded-xl shadow-2xl"
+      className="grid gap-2 p-4 bg-slate-800 rounded-xl shadow-2xl w-72 sm:w-80 md:w-96"
       style={{ gridTemplateColumns }}
       onDragEnd={handleDragEnd}
     >
@@ -73,7 +77,9 @@ export function Board({
               index={index}
               isSelected={isSelected}
               isDragging={isDragging}
+              isFlipped={isTileFlipped?.(tile.id) ?? false}
               onClick={() => onTileClick(index)}
+              onFlip={onFlipTile ? () => onFlipTile(tile.id) : undefined}
               onDragStart={handleDragStart}
               onDragOver={(e) => handleDragOver(e, index)}
               onDrop={handleDrop}

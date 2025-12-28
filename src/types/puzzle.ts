@@ -24,8 +24,21 @@ export interface LineData {
   paths: LinePath[];
 }
 
+// Pixel art tile data - small grid of colored pixels
+export interface PixelData {
+  type: 'pixels';
+  grid: string[][]; // 2D array of hex colors (e.g., 4x4 grid)
+}
+
+// Double-sided tile data - two different visuals
+export interface DoubleSidedData {
+  type: 'double-sided';
+  faceA: ColorData | PixelData;
+  faceB: ColorData | PixelData;
+}
+
 // Union type for tile content
-export type TileContent = ColorData | LineData;
+export type TileContent = ColorData | LineData | PixelData | DoubleSidedData;
 
 // A single puzzle tile
 export interface Tile {
@@ -43,6 +56,8 @@ export interface Puzzle {
   solutionB: string[]; // tile IDs in order for arrangement B
   imageA: string; // Description/name of what arrangement A depicts
   imageB: string; // Description/name of what arrangement B depicts
+  // For double-sided puzzles: which face to show for each solution
+  requiresFlip?: boolean;
 }
 
 // Game state
@@ -53,6 +68,8 @@ export interface GameState {
   solvedA: boolean;
   solvedB: boolean;
   moveCount: number;
+  // For double-sided puzzles
+  flippedTiles?: Set<string>; // tile IDs that are showing face B
 }
 
 // Helper type for getting tile at position
